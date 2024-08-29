@@ -1,20 +1,5 @@
-/*
-  Warnings:
-
-  - You are about to drop the `user` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
 CREATE TYPE "EmailStatus" AS ENUM ('SENT', 'FAILED');
-
--- DropForeignKey
-ALTER TABLE "user" DROP CONSTRAINT "user_created_by_fkey";
-
--- DropTable
-DROP TABLE "user";
-
--- DropEnum
-DROP TYPE "Role";
 
 -- CreateTable
 CREATE TABLE "Email" (

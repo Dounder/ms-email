@@ -6,6 +6,7 @@ import { OtpEmailParamsDto } from './dto/otp-email-params.dto';
 import { readFileSync } from 'fs';
 import { envs } from 'src/config';
 import { RpcException } from '@nestjs/microservices';
+import { EmailResponse } from './interfaces';
 
 @Injectable()
 export class EmailService extends PrismaClient implements OnModuleInit {
@@ -23,8 +24,7 @@ export class EmailService extends PrismaClient implements OnModuleInit {
   async sendEmail(emailParams: EmailParamsDto) {
     const { to, subject, text } = emailParams;
 
-    const resp = await this.mailer.sendMail({ from: envs.emailFrom, to, subject, text });
-    console.log('🚀 ~ EmailService ~ sendEmail ~ resp:', resp);
+    const resp = (await this.mailer.sendMail({ from: envs.emailFrom, to, subject, text })) as EmailResponse;
 
     this.logger.log(`Email sent to ${to}`);
 
@@ -34,7 +34,7 @@ export class EmailService extends PrismaClient implements OnModuleInit {
         subject,
         text,
         from: envs.emailFrom,
-        messageId: '1',
+        messageId: resp?.messageId,
       },
     });
   }
@@ -45,13 +45,8 @@ export class EmailService extends PrismaClient implements OnModuleInit {
       const from = envs.emailFrom;
       const template = readFileSync('./src/email/templates/otp-template.html', 'utf8');
       const html = template.replace(/{{otp}}/g, otp).replace(/{{username}}/g, username);
-      const resp = await this.mailer.sendMail({
-        from,
-        to,
-        subject: `Your OTP [${otp}]`,
-        html,
-      });
-      console.log('🚀 ~ EmailService ~ sendOtpEmail ~ resp:', resp);
+      // const resp = (await this.mailer.sendMail({ from, to, subject: `Your OTP [${otp}]`, html })) as EmailResponse;
+
       this.logger.log(`Email sent to ${to} with OTP: ${otp}`);
       await this.email.create({
         data: {
@@ -59,7 +54,7 @@ export class EmailService extends PrismaClient implements OnModuleInit {
           subject: `Your OTP [${otp}]`,
           text: html,
           from,
-          messageId: '1',
+          // messageId: resp?.messageId,
         },
       });
 
