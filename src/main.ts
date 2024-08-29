@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 import { envs } from './config';
 
 async function bootstrap() {
-  const logger = new Logger('AuthMain');
+  const logger = new Logger('EmailMain');
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
     transport: Transport.NATS,
